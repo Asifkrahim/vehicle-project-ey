@@ -1,0 +1,538 @@
+/* ========================================
+   1. CORE SETUP & VARIABLES
+   ======================================== */
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,400;0,600;0,700;1,700&family=Inter:wght@300;400;500&display=swap');
+
+:root {
+    --primary: #ffd700;
+    --primary-glow: rgba(255, 215, 0, 0.5);
+    --secondary: #ffffff;
+    --bg-dark: #090909;
+    --surface: rgba(25, 25, 25, 0.7);
+    --border: rgba(255, 255, 255, 0.1);
+    --text-body: #a0a0a0;
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-dark);
+    background-image: 
+        radial-gradient(circle at 50% 0%, rgba(255, 215, 0, 0.08) 0%, transparent 50%),
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 30px 30px, 30px 30px;
+    color: var(--secondary);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ========================================
+   2. CINEMATIC TEXT ANIMATIONS
+   ======================================== */
+
+/* The Metallic Gradient Text Effect */
+h1, h2, .brand-text {
+    font-family: 'Exo 2', sans-serif;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 2px;
+    background: linear-gradient(to right, #fff 20%, #ffd700 50%, #fff 80%);
+    background-size: 200% auto;
+    color: #fff;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 4s linear infinite;
+    display: inline-block;
+}
+
+/* Subtitles */
+.subtitle, p {
+    color: var(--text-body);
+    font-weight: 300;
+    line-height: 1.6;
+}
+
+/* Entrance Animations */
+.auth-card, .dashboard-card, .dashboard-header {
+    animation: slideUpFade 0.8s var(--ease-out) forwards;
+}
+
+/* Stagger delays for children */
+h1 { animation: slideUpFade 0.8s var(--ease-out) 0.1s both, shine 4s linear infinite; }
+.subtitle { animation: slideUpFade 0.8s var(--ease-out) 0.2s both; }
+.form-group:nth-child(1) { animation: slideUpFade 0.8s var(--ease-out) 0.3s both; }
+.form-group:nth-child(2) { animation: slideUpFade 0.8s var(--ease-out) 0.4s both; }
+.btn { animation: slideUpFade 0.8s var(--ease-out) 0.5s both; }
+
+/* Keyframes */
+@keyframes slideUpFade {
+    0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.98);
+        filter: blur(5px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes shine {
+    to { background-position: 200% center; }
+}
+
+/* ========================================
+   3. MODERN INPUTS & FORMS
+   ======================================== */
+.form-group {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--primary);
+    font-size: 0.8em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: 0.3s;
+}
+
+input, select {
+    width: 100%;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+/* Glowing Focus State */
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.15), inset 0 0 10px rgba(255, 215, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+/* Input Hover - Subtle border reveal */
+input:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ========================================
+   4. HIGH-PERFORMANCE BUTTONS
+   ======================================== */
+.btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--primary);
+    border: none;
+    border-radius: 8px;
+    color: #000;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.4s var(--ease-out);
+    position: relative;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+/* Button "Scanner" Effect */
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    transition: 0.5s;
+    transform: skewX(-15deg);
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+}
+
+.btn:hover::before {
+    left: 150%;
+    transition: 0.7s;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 215, 0, 0.1);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+/* ========================================
+   5. LAYOUT & GLASSMORPHISM
+   ======================================== */
+.auth-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 480px;
+}
+
+.auth-card, .dashboard-card, .dashboard-header {
+    background: var(--surface);
+    /* The modern blurred glass effect */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 30px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* ========================================
+   6. DATA TABLES (Interactive)
+   ======================================== */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 6px;
+    margin-top: 20px;
+}
+
+th {
+    text-align: left;
+    padding: 15px;
+    color: var(--primary);
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
+
+td {
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid transparent;
+    transition: 0.2s;
+}
+
+tr td:first-child { border-radius: 8px 0 0 8px; }
+tr td:last-child { border-radius: 0 8px 8px 0; }
+
+tr:hover td {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.01);
+}
+
+.alert-upcoming, .alert-due {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 600;
+}
+
+.alert-upcoming {
+    background: rgba(255, 215, 0, 0.15);
+    color: var(--primary);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.alert-due {
+    background: rgba(255, 68, 68, 0.15);
+    color: #ff4444;
+    border: 1px solid rgba(255, 68, 68, 0.3);
+    animation: pulseRed 2s infinite;
+}
+
+.delete-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 68, 68, 0.5);
+    color: #ff4444;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: 0.3s;
+}
+
+.delete-btn:hover {
+    background: #ff4444;
+    color: white;
+    box-shadow: 0 0 15px rgba(255, 68, 68, 0.4);
+}
+
+@keyframes pulseRed {
+    0% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(255, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); }
+}
+
+/* ========================================
+   7. 3D CAR ANIMATION (Polished)
+   ======================================== */
+.car-animation {
+    width: 280px;
+    height: 140px;
+    margin: 0 auto 40px;
+    position: relative;
+    perspective: 800px;
+    /* This makes the whole car float smoothly */
+    animation: float 6s ease-in-out infinite;
+}
+
+.car-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: driving 3s ease-in-out infinite;
+}
+
+.car-body {
+    width: 130px;
+    height: 45px;
+    background: linear-gradient(90deg, #ffd700, #ffed4e);
+    border-radius: 12px 12px 6px 6px;
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 
+        inset 0 -5px 10px rgba(0,0,0,0.2),
+        0 10px 20px rgba(255, 215, 0, 0.15);
+    z-index: 2;
+}
+
+.car-top {
+    width: 75px;
+    height: 35px;
+    background: #ffed4e;
+    border-radius: 15px 15px 0 0;
+    position: absolute;
+    bottom: 55px; /* Sits on top of body */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+}
+
+/* Windows */
+.car-top::after {
+    content: '';
+    position: absolute;
+    top: 5px; left: 8px; right: 8px; bottom: 0;
+    background: #222;
+    border-radius: 10px 10px 0 0;
+}
+
+.wheel {
+    width: 24px;
+    height: 24px;
+    background: #222;
+    border: 2px solid #444;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 18px;
+    z-index: 3;
+    animation: spin 0.8s linear infinite;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.wheel::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px; height: 8px;
+    background: #555;
+    border-radius: 50%;
+}
+
+.wheel.left { left: 80px; }
+.wheel.right { right: 80px; }
+
+.headlight {
+    width: 10px; height: 6px;
+    background: #fff;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 45px;
+    left: 70px; /* Adjust based on car position */
+    box-shadow: 
+        0 0 10px #fff, 
+        -20px 0 30px rgba(255, 255, 255, 0.4);
+    z-index: 4;
+    opacity: 0.8;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes driving {
+    0%, 100% { transform: rotateZ(-1deg); }
+    50% { transform: rotateZ(1deg); }
+}
+
+@keyframes spin {
+    to { transform: rotate(-360deg); }
+}
+
+/* ========================================
+   8. RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+    .form-row { grid-template-columns: 1fr; }
+    h1 { font-size: 2em; }
+}
+
+.error, .success-msg {
+    text-align: center;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    font-size: 0.9em;
+}
+.error { color: #ff4444; background: rgba(255, 68, 68, 0.1); }
+.success-msg { color: #00ff00; background: rgba(0, 255, 0, 0.1); }
+
+/* Health Monitor Styling */
+.health-item {
+    margin-bottom: 25px;
+}
+
+.health-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #fff;
+    font-family: 'Exo 2', sans-serif;
+    letter-spacing: 1px;
+}
+
+.health-detail {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.8em;
+    color: var(--text-body);
+}
+
+.progress-container {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+    position: relative;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--primary); /* Neon Yellow */
+    border-radius: 10px;
+    box-shadow: 0 0 10px var(--primary-glow);
+    position: relative;
+    /* Animation on load */
+    animation: loadBar 1.5s ease-out forwards;
+}
+
+/* Shine effect moving across the bar */
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(
+        90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.4), 
+        transparent
+    );
+    transform: translateX(-100%);
+    animation: shimmer 2s infinite;
+}
+
+/* Critical State (Red) */
+.progress-bar.critical {
+    background: #ff4444;
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.6);
+}
+
+.alert-text {
+    color: #ff4444;
+}
+
+/* Animations */
+@keyframes loadBar {
+    from { width: 0; }
+}
+
+@keyframes shimmer {
+    100% { transform: translateX(100%); }
+}

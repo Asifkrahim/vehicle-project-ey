@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VehicleCare+ | Dashboard</title>
+    
+    <link rel="stylesheet" href="{% static 'vehiclecareapp/style.css' %}">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        .garage-selector { display: flex; gap: 20px; margin-bottom: 30px; overflow-x: auto; padding-bottom: 10px; }
+        .garage-selector::-webkit-scrollbar { display: none; }
+        .garage-card { min-width: 160px; height: 110px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 15px; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
+        .garage-card.active { background: rgba(255, 215, 0, 0.15); border-color: #ffd700; box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); transform: translateY(-5px); }
+        .garage-card h3 { font-size: 1.1em; margin-bottom: 5px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .garage-card p { font-size: 0.8em; color: #aaa; }
+        .garage-icon { position: absolute; right: -10px; bottom: -10px; font-size: 4em; opacity: 0.1; transform: rotate(-10deg); }
+        .progress-bar { transition: width 0.6s ease, background-color 0.3s; }
+        .chat-btn { position: fixed; bottom: 30px; right: 30px; background: #ffd700; color: #000; width: 60px; height: 60px; border-radius: 50%; font-size: 28px; border: none; cursor: pointer; z-index: 1000; }
+        .chat-window { display: none; position: fixed; bottom: 100px; right: 30px; width: 350px; height: 500px; background: rgba(20, 20, 20, 0.9); border-radius: 20px; z-index: 1000; flex-direction: column; }
+        .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 10px; border-radius: 10px; max-width: 80%; }
+        .bot { background: #333; color: white; align-self: flex-start; }
+        .user { background: #ffd700; color: black; align-self: flex-end; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <div class="dashboard-header">
+            <div class="header-info">
+                <h1>VehicleCare+</h1>
+                <p>Welcome, <strong>{{ request.user.username }}</strong></p>
+            </div>
+            <a href="{% url 'logout' %}" class="btn btn-secondary" style="width: auto;">Logout</a>
+        </div>
+
+        <div class="garage-selector">
+            {% if vehicles %}
+                {% for car in vehicles %}
+                <div class="garage-card {% if forloop.first %}active{% endif %}" 
+                     onclick="selectCar(this)"
+                     data-brand="{{ car.brand }}"
+                     data-model="{{ car.model }}"
+                     data-oil="{{ car.oil_life }}"
+                     data-oil-msg="{{ car.oil_msg }}"
+                     data-brake="{{ car.brake_life }}"
+                     data-brake-msg="{{ car.brake_msg }}">
+                     
+                    <h3>{{ car.brand }} {{ car.model }}</h3>
+                    <p>{{ car.type }}</p>
+                    <div class="garage-icon">{{ car.icon }}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="garage-card">
+                    <h3>No Vehicles</h3>
+                    <p>Add a record below</p>
+                </div>
+            {% endif %}
+            <div class="garage-card" style="align-items: center; justify-content: center; border-style: dashed; opacity: 0.6;">
+                <h3 style="font-size: 2em; color: #ffd700;">+</h3>
+            </div>
+        </div>
+
+        <div class="car-scene-wrapper">
+            <div class="speed-lines"></div>
+            <div class="road-grid"></div>
+            <div class="sports-car">
+                <div class="car-body-shape"><div class="windshield"></div></div>
+                <div class="wheel front"></div><div class="wheel back"></div>
+                <div class="underglow"></div><div class="tail-light"></div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+            <div class="dashboard-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                    <h2 class="card-title" style="margin:0;">Vehicle Health Status</h2>
+                    <span id="selectedCarLabel" style="color:#ffd700; border:1px solid #ffd700; padding:2px 8px; border-radius:10px; font-size:0.8em;">
+                        Select Vehicle
+                    </span>
+                </div>
+                
+                <div class="health-item">
+                    <div class="health-info"><span>Engine Oil</span> <span class="percentage" id="oilPercent">0%</span></div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="oilBar" style="width: 0%; background: #ffd700;"></div>
+                    </div>
+                    <small id="oilMsg">--</small>
+                </div>
+
+                <div class="health-item">
+                    <div class="health-info"><span>Brake Pads</span> <span class="percentage" id="brakePercent">0%</span></div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="brakeBar" style="width: 0%; background: #ffd700;"></div>
+                    </div>
+                    <small id="brakeMsg">--</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row" style="grid-template-columns: 1fr 1fr; gap: 30px;">
+            <div class="dashboard-card">
+                <h2>Add Service</h2>
+                <form method="POST" action="{% url 'add_maintenance' %}">
+                    {% csrf_token %}
+                    <div class="form-group"><label>Details</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <input type="text" name="vehicle_brand" placeholder="Brand" required>
+                            <input type="text" name="vehicle_model" placeholder="Model" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <select name="vehicle_type" required><option value="Car">Car</option><option value="Bike">Bike</option></select>
+                        <select name="maintenance_type" required><option value="Oil Change">Oil Change</option><option value="Brake">Brake</option><option value="Battery">Battery</option></select>
+                    </div>
+                    <div class="form-row">
+                        <input type="number" name="odometer_reading" placeholder="Km" required>
+                        <input type="date" name="date" required>
+                    </div>
+                    <button type="submit" class="btn">Add Record</button>
+                </form>
+            </div>
+
+            <div class="dashboard-card">
+                <h2>History</h2>
+                <table>
+                    <thead><tr><th>Vehicle</th><th>Service</th><th>Due (km)</th><th>Date</th></tr></thead>
+                    <tbody>
+                        {% for record in records %}
+                        <tr>
+                            <td>{{ record.vehicle_brand }}</td>
+                            <td>{{ record.maintenance_type }}</td>
+                            <td style="color:#ffd700">{{ record.next_service_km }}</td>
+                            <td>{{ record.date }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4">No records found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <button class="chat-btn" onclick="toggleChat()">💬</button>
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header"><span>Assistant</span><span onclick="toggleChat()" style="cursor:pointer;">X</span></div>
+        <div class="chat-body" id="chatBody"><div class="msg bot">Hi! Need help?</div></div>
+        <div style="padding:10px; display:flex;"><input id="chatInput" type="text" style="flex:1;"><button onclick="sendMsg()">></button></div>
+    </div>
+
+    <script>
+        function toggleChat() { document.getElementById('chatWindow').style.display = document.getElementById('chatWindow').style.display === 'flex' ? 'none' : 'flex'; }
+        
+        function sendMsg() {
+            var val = document.getElementById('chatInput').value;
+            if(!val) return;
+            var body = document.getElementById('chatBody');
+            body.innerHTML += `<div class="msg user">${val}</div>`;
+            document.getElementById('chatInput').value = "";
+            
+            fetch(`/chatbot-response/?message=${encodeURIComponent(val)}`)
+                .then(r => r.json())
+                .then(d => { body.innerHTML += `<div class="msg bot">${d.response}</div>`; body.scrollTop = body.scrollHeight; });
+        }
+
+        // Logic to update health bars
+        function selectCar(el) {
+            document.querySelectorAll('.garage-card').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            
+            var brand = el.getAttribute('data-brand');
+            var model = el.getAttribute('data-model');
+            var oil = el.getAttribute('data-oil');
+            var brake = el.getAttribute('data-brake');
+
+            document.getElementById('selectedCarLabel').innerText = brand + " " + model;
+            document.getElementById('oilPercent').innerText = oil + "%";
+            document.getElementById('oilMsg').innerText = el.getAttribute('data-oil-msg');
+            document.getElementById('brakePercent').innerText = brake + "%";
+            document.getElementById('brakeMsg').innerText = el.getAttribute('data-brake-msg');
+
+            var oilBar = document.getElementById('oilBar');
+            oilBar.style.width = oil + "%";
+            oilBar.style.background = oil < 20 ? '#ff4444' : '#ffd700';
+
+            var brakeBar = document.getElementById('brakeBar');
+            brakeBar.style.width = brake + "%";
+            brakeBar.style.background = brake < 30 ? '#ff4444' : '#ffd700';
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // AUTO-SELECT FIRST VEHICLE
+            const firstCard = document.querySelector('.garage-card.active');
+            if(firstCard) {
+                selectCar(firstCard);
+            }
+        });
+    </script>
+</body>
+</html>

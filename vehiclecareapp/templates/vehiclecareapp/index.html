@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VehicleCare+ - Login</title>
+    <link rel="stylesheet" href="{% static 'vehiclecareapp/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+    <div class="container">
+        <div class="auth-card">
+            <h1>VehicleCare+</h1>
+            <p class="subtitle">Your Smart Vehicle Maintenance Tracker</p>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="error">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" name="email" id="loginEmail" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" name="password" id="loginPassword" required>
+                </div>
+                
+                <button type="submit" class="btn">Login</button>
+            </form>
+
+            <a href="{% url 'signup' %}" class="btn btn-secondary">Create Account</a>
+        </div>
+    </div>
+</body>
+</html>
