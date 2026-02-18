@@ -1,4 +1,6 @@
 from pathlib import Path
+import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -9,7 +11,7 @@ SECRET_KEY = 'django-insecure-x195(*%@m7f%t9k^c%_lxmobnjn6+c)=*y4z!sk%#5%g8jn^$2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.vercel.app', '127.0.0.1', 'localhost']
 
 # Application definition
 INSTALLED_APPS = [
@@ -53,12 +55,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'vehiclecareproject.wsgi.application'
 
 # Database
+# Default to SQLite (for your local computer)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# If running on Vercel, overwrite with the online database
+database_url = os.environ.get("DATABASE_URL")
+if database_url:
+    DATABASES["default"] = dj_database_url.parse(database_url)
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
