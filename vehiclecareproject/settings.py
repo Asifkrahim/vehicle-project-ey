@@ -66,7 +66,7 @@ DATABASES = {
 # If running on Vercel, overwrite with the online database
 database_url = os.environ.get("DATABASE_URL")
 if database_url:
-    DATABASES["default"] = dj_database_url.parse(database_url)
+    DATABASES["default"] = dj_database_url.parse("postgresql://neondb_owner:npg_hZOX7gzNvlp5@ep-weathered-breeze-ai7xdioq-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require")
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
