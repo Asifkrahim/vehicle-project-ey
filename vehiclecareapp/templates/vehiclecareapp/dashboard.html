@@ -15,18 +15,30 @@
     <style>
         .garage-selector { display: flex; gap: 20px; margin-bottom: 30px; overflow-x: auto; padding-bottom: 10px; }
         .garage-selector::-webkit-scrollbar { display: none; }
-        .garage-card { min-width: 160px; height: 110px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 15px; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
+        .garage-card { min-width: 180px; height: 120px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 15px; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
         .garage-card.active { background: rgba(255, 215, 0, 0.15); border-color: #ffd700; box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); transform: translateY(-5px); }
         .garage-card h3 { font-size: 1.1em; margin-bottom: 5px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .garage-card p { font-size: 0.8em; color: #aaa; }
         .garage-icon { position: absolute; right: -10px; bottom: -10px; font-size: 4em; opacity: 0.1; transform: rotate(-10deg); }
-        .progress-bar { transition: width 0.6s ease, background-color 0.3s; }
-        .chat-btn { position: fixed; bottom: 30px; right: 30px; background: #ffd700; color: #000; width: 60px; height: 60px; border-radius: 50%; font-size: 28px; border: none; cursor: pointer; z-index: 1000; }
-        .chat-window { display: none; position: fixed; bottom: 100px; right: 30px; width: 350px; height: 500px; background: rgba(20, 20, 20, 0.9); border-radius: 20px; z-index: 1000; flex-direction: column; }
+        
+        .progress-bar { transition: width 0.6s ease, background-color 0.3s; height: 8px; border-radius: 4px; }
+        .progress-container { background: rgba(255,255,255,0.1); border-radius: 4px; height: 8px; margin: 5px 0; overflow: hidden;}
+        
+        .chat-btn { position: fixed; bottom: 30px; right: 30px; background: #ffd700; color: #000; width: 60px; height: 60px; border-radius: 50%; font-size: 28px; border: none; cursor: pointer; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .chat-window { display: none; position: fixed; bottom: 100px; right: 30px; width: 350px; height: 500px; background: #1a1a1a; border: 1px solid #333; border-radius: 20px; z-index: 1000; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .chat-header { padding: 15px; background: #ffd700; color: black; font-weight: bold; border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; }
         .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 10px; border-radius: 10px; max-width: 80%; }
-        .bot { background: #333; color: white; align-self: flex-start; }
-        .user { background: #ffd700; color: black; align-self: flex-end; }
+        .msg { padding: 10px; border-radius: 10px; max-width: 80%; font-size: 0.9em; }
+        .bot { background: #333; color: white; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .user { background: #ffd700; color: black; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .chat-input-area { padding: 10px; display: flex; gap: 5px; border-top: 1px solid #333; }
+        .chat-input-area input { flex: 1; padding: 10px; border-radius: 20px; border: none; outline: none; background: #333; color: white; }
+        .chat-input-area button { padding: 10px 15px; border-radius: 50%; border: none; background: #ffd700; cursor: pointer; font-weight: bold; }
+        
+        .health-item { margin-bottom: 15px; }
+        .health-info { display: flex; justify-content: space-between; font-size: 0.9em; color: #ddd; }
+        .health-info .percentage { color: #ffd700; font-weight: bold; }
+        small { display: block; font-size: 0.75em; color: #888; text-align: right; margin-top: 2px; }
     </style>
 </head>
 <body>
@@ -40,6 +52,27 @@
             <a href="{% url 'logout' %}" class="btn btn-secondary" style="width: auto;">Logout</a>
         </div>
 
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+            <div class="dashboard-card" style="background: linear-gradient(135deg, #1a1a1a, #252525);">
+                <h3 style="color: #aaa; margin: 0; font-size: 0.9em; text-transform: uppercase;">Total Expenses</h3>
+                <h1 style="color: #00C851; font-size: 2.5em; margin: 10px 0;">₹ {{ total_expense|default:"0" }}</h1>
+                <p style="font-size: 0.8em; color: #666;">Lifetime maintenance cost</p>
+            </div>
+
+            <div class="dashboard-card" style="background: linear-gradient(135deg, #1a1a1a, #252525); display: flex; flex-direction: column; justify-content: center;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 style="color: #fff; margin: 0;">Need Help?</h3>
+                        <p style="color: #aaa; font-size: 0.9em;">Find nearest workshops</p>
+                    </div>
+                    <a href="https://www.google.com/maps/search/mechanic+near+me" target="_blank" 
+                       style="background: #ffd700; color: #000; padding: 12px 20px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 0.9em; white-space: nowrap;">
+                       📍 Find Mechanic
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <div class="garage-selector">
             {% if vehicles %}
                 {% for car in vehicles %}
@@ -47,13 +80,20 @@
                      onclick="selectCar(this)"
                      data-brand="{{ car.brand }}"
                      data-model="{{ car.model }}"
+                     data-number="{{ car.number }}"
+                     
                      data-oil="{{ car.oil_life }}"
                      data-oil-msg="{{ car.oil_msg }}"
                      data-brake="{{ car.brake_life }}"
-                     data-brake-msg="{{ car.brake_msg }}">
+                     data-brake-msg="{{ car.brake_msg }}"
+                     data-air="{{ car.air_life }}"
+                     data-air-msg="{{ car.air_msg }}"
+                     data-coolant="{{ car.coolant_life }}"
+                     data-coolant-msg="{{ car.coolant_msg }}">
                      
                     <h3>{{ car.brand }} {{ car.model }}</h3>
-                    <p>{{ car.type }}</p>
+                    <p style="color: #ffd700; font-weight: bold;">{{ car.number }}</p>
+                    <p>{{ car.type }} • {{ car.current_odo }} km</p>
                     <div class="garage-icon">{{ car.icon }}</div>
                 </div>
                 {% endfor %}
@@ -63,9 +103,6 @@
                     <p>Add a record below</p>
                 </div>
             {% endif %}
-            <div class="garage-card" style="align-items: center; justify-content: center; border-style: dashed; opacity: 0.6;">
-                <h3 style="font-size: 2em; color: #ffd700;">+</h3>
-            </div>
         </div>
 
         <div class="car-scene-wrapper">
@@ -88,120 +125,187 @@
                 </div>
                 
                 <div class="health-item">
-                    <div class="health-info"><span>Engine Oil</span> <span class="percentage" id="oilPercent">0%</span></div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="oilBar" style="width: 0%; background: #ffd700;"></div>
-                    </div>
+                    <div class="health-info"><span>🛢️ Engine Oil</span> <span class="percentage" id="oilPercent">0%</span></div>
+                    <div class="progress-container"><div class="progress-bar" id="oilBar" style="width: 0%; background: #ffd700;"></div></div>
                     <small id="oilMsg">--</small>
                 </div>
-
                 <div class="health-item">
-                    <div class="health-info"><span>Brake Pads</span> <span class="percentage" id="brakePercent">0%</span></div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="brakeBar" style="width: 0%; background: #ffd700;"></div>
-                    </div>
+                    <div class="health-info"><span>🛑 Brake System</span> <span class="percentage" id="brakePercent">0%</span></div>
+                    <div class="progress-container"><div class="progress-bar" id="brakeBar" style="width: 0%; background: #ffd700;"></div></div>
                     <small id="brakeMsg">--</small>
+                </div>
+                <div class="health-item">
+                    <div class="health-info"><span>💨 Air Filter</span> <span class="percentage" id="airPercent">0%</span></div>
+                    <div class="progress-container"><div class="progress-bar" id="airBar" style="width: 0%; background: #ffd700;"></div></div>
+                    <small id="airMsg">--</small>
+                </div>
+                <div class="health-item">
+                    <div class="health-info"><span>❄️ Coolant</span> <span class="percentage" id="coolantPercent">0%</span></div>
+                    <div class="progress-container"><div class="progress-bar" id="coolantBar" style="width: 0%; background: #ffd700;"></div></div>
+                    <small id="coolantMsg">--</small>
                 </div>
             </div>
         </div>
 
         <div class="form-row" style="grid-template-columns: 1fr 1fr; gap: 30px;">
             <div class="dashboard-card">
-                <h2>Add Service</h2>
+                <h2>Add Service Record</h2>
                 <form method="POST" action="{% url 'add_maintenance' %}">
                     {% csrf_token %}
-                    <div class="form-group"><label>Details</label>
+                    <div class="form-group"><label>Vehicle Details</label>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <input type="text" name="vehicle_brand" placeholder="Brand" required>
-                            <input type="text" name="vehicle_model" placeholder="Model" required>
+                            <input type="text" name="vehicle_brand" placeholder="Brand (e.g. Honda)" required>
+                            <input type="text" name="vehicle_model" placeholder="Model (e.g. Civic)" required>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <input type="text" name="vehicle_number" placeholder="License Plate (e.g. KL-07-AB-1234)" required style="width: 100%;">
                         </div>
                     </div>
+                    
                     <div class="form-row">
-                        <select name="vehicle_type" required><option value="Car">Car</option><option value="Bike">Bike</option></select>
-                        <select name="maintenance_type" required><option value="Oil Change">Oil Change</option><option value="Brake">Brake</option><option value="Battery">Battery</option></select>
+                        <select name="vehicle_type" required>
+                            <option value="" disabled selected>Type</option>
+                            <option value="Car">Car</option>
+                            <option value="Bike">Bike</option>
+                        </select>
+                        <select name="maintenance_type" required>
+                            <option value="" disabled selected>Service Type</option>
+                            <option value="Oil Change">Oil Change</option>
+                            <option value="Brake Inspection">Brake Inspection</option>
+                            <option value="Air Filter">Air Filter</option>
+                            <option value="Coolant Flush">Coolant Flush</option>
+                            <option value="Tire Rotation">Tire Rotation (Car)</option>
+                            <option value="Chain Lube">Chain Lube (Bike)</option>
+                            <option value="Chain Adjustment">Chain Adjustment (Bike)</option>
+                            <option value="Spark Plugs">Spark Plugs</option>
+                            <option value="Battery Check">Battery Check</option>
+                            <option value="Transmission Fluid">Transmission Fluid</option>
+                            <option value="General Service">General Service</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <input type="number" name="odometer_reading" placeholder="Current Odometer (km)" required>
+                        <input type="number" step="0.01" name="cost" placeholder="Cost (₹)" required>
                     </div>
                     <div class="form-row">
-                        <input type="number" name="odometer_reading" placeholder="Km" required>
-                        <input type="date" name="date" required>
+                        <input type="date" name="date" required style="width: 100%;">
                     </div>
+                    
                     <button type="submit" class="btn">Add Record</button>
                 </form>
             </div>
 
             <div class="dashboard-card">
-                <h2>History</h2>
-                <table>
-                    <thead><tr><th>Vehicle</th><th>Service</th><th>Due (km)</th><th>Date</th></tr></thead>
-                    <tbody>
-                        {% for record in records %}
-                        <tr>
-                            <td>{{ record.vehicle_brand }}</td>
-                            <td>{{ record.maintenance_type }}</td>
-                            <td style="color:#ffd700">{{ record.next_service_km }}</td>
-                            <td>{{ record.date }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="4">No records found.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <h2>Recent History</h2>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #333; text-align: left;">
+                                <th style="padding: 10px;">Vehicle</th>
+                                <th style="padding: 10px;">Service</th>
+                                <th style="padding: 10px;">Cost</th> 
+                                <th style="padding: 10px;">DIY Guide</th>
+                                <th style="padding: 10px;">Next Due</th>
+                                <th style="padding: 10px;">Date</th>
+                                <th style="padding: 10px; text-align: center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in records %}
+                            <tr style="border-bottom: 1px solid #222;">
+                                <td style="padding: 10px;">
+                                    {{ record.vehicle_brand }} {{ record.vehicle_model }}<br>
+                                    <span style="font-size: 0.8em; color: #ffd700;">{{ record.vehicle_number }}</span>
+                                </td>
+                                <td style="padding: 10px;">{{ record.maintenance_type }}</td>
+                                <td style="padding: 10px; color: #00C851;">₹{{ record.cost }}</td>
+                                
+                                <td style="padding: 10px;">
+                                    <a href="https://www.youtube.com/results?search_query=how+to+{{ record.maintenance_type }}+{{ record.vehicle_brand }}+{{ record.vehicle_model }}" 
+                                       target="_blank" 
+                                       style="color: #ff4444; text-decoration: none; font-weight: bold; font-size: 0.9em;">
+                                       ▶ Watch
+                                    </a>
+                                </td>
+
+                                <td style="padding: 10px; color: #ffd700;">{{ record.next_service_km }} km</td>
+                                <td style="padding: 10px;">{{ record.date }}</td>
+                                <td style="padding: 10px; text-align: center;">
+                                    <a href="{% url 'delete_record' record.id %}" 
+                                       onclick="return confirm('Delete this record?');"
+                                       style="text-decoration: none; font-size: 1.2em;" title="Delete">🗑️</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="7" style="text-align:center; padding: 20px; color:#666;">No records found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
     <button class="chat-btn" onclick="toggleChat()">💬</button>
     <div class="chat-window" id="chatWindow">
-        <div class="chat-header"><span>Assistant</span><span onclick="toggleChat()" style="cursor:pointer;">X</span></div>
-        <div class="chat-body" id="chatBody"><div class="msg bot">Hi! Need help?</div></div>
-        <div style="padding:10px; display:flex;"><input id="chatInput" type="text" style="flex:1;"><button onclick="sendMsg()">></button></div>
+        <div class="chat-header"><span>Mechanic AI</span><span onclick="toggleChat()" style="cursor:pointer;">✕</span></div>
+        <div class="chat-body" id="chatBody"><div class="msg bot">Hi! I can help with maintenance schedules.</div></div>
+        <div class="chat-input-area">
+            <input id="chatInput" type="text" placeholder="Ask about oil, brakes...">
+            <button onclick="sendMsg()">></button>
+        </div>
     </div>
 
     <script>
-        function toggleChat() { document.getElementById('chatWindow').style.display = document.getElementById('chatWindow').style.display === 'flex' ? 'none' : 'flex'; }
-        
+        function toggleChat() { 
+            const win = document.getElementById('chatWindow');
+            win.style.display = win.style.display === 'flex' ? 'none' : 'flex'; 
+        }
         function sendMsg() {
-            var val = document.getElementById('chatInput').value;
+            var input = document.getElementById('chatInput');
+            var val = input.value;
             if(!val) return;
             var body = document.getElementById('chatBody');
             body.innerHTML += `<div class="msg user">${val}</div>`;
-            document.getElementById('chatInput').value = "";
-            
+            input.value = "";
+            body.scrollTop = body.scrollHeight;
             fetch(`/chatbot-response/?message=${encodeURIComponent(val)}`)
                 .then(r => r.json())
-                .then(d => { body.innerHTML += `<div class="msg bot">${d.response}</div>`; body.scrollTop = body.scrollHeight; });
+                .then(d => { body.innerHTML += `<div class="msg bot">${d.response}</div>`; body.scrollTop = body.scrollHeight; })
+                .catch(err => { body.innerHTML += `<div class="msg bot" style="color:red">Connection error.</div>`; });
+        }
+        document.getElementById("chatInput").addEventListener("keypress", function(e) { if (e.key === "Enter") sendMsg(); });
+
+        function updateBar(elementId, percentId, msgId, value, msg) {
+            document.getElementById(percentId).innerText = value + "%";
+            document.getElementById(msgId).innerText = msg;
+            var bar = document.getElementById(elementId);
+            bar.style.width = value + "%";
+            if (value < 30) bar.style.background = '#ff4444';
+            else if (value < 60) bar.style.background = '#ffbb33';
+            else bar.style.background = '#00C851';
         }
 
-        // Logic to update health bars
         function selectCar(el) {
             document.querySelectorAll('.garage-card').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
             
             var brand = el.getAttribute('data-brand');
             var model = el.getAttribute('data-model');
-            var oil = el.getAttribute('data-oil');
-            var brake = el.getAttribute('data-brake');
+            var number = el.getAttribute('data-number');
+            
+            document.getElementById('selectedCarLabel').innerText = brand + " " + model + " (" + number + ")";
 
-            document.getElementById('selectedCarLabel').innerText = brand + " " + model;
-            document.getElementById('oilPercent').innerText = oil + "%";
-            document.getElementById('oilMsg').innerText = el.getAttribute('data-oil-msg');
-            document.getElementById('brakePercent').innerText = brake + "%";
-            document.getElementById('brakeMsg').innerText = el.getAttribute('data-brake-msg');
-
-            var oilBar = document.getElementById('oilBar');
-            oilBar.style.width = oil + "%";
-            oilBar.style.background = oil < 20 ? '#ff4444' : '#ffd700';
-
-            var brakeBar = document.getElementById('brakeBar');
-            brakeBar.style.width = brake + "%";
-            brakeBar.style.background = brake < 30 ? '#ff4444' : '#ffd700';
+            updateBar('oilBar', 'oilPercent', 'oilMsg', el.getAttribute('data-oil'), el.getAttribute('data-oil-msg'));
+            updateBar('brakeBar', 'brakePercent', 'brakeMsg', el.getAttribute('data-brake'), el.getAttribute('data-brake-msg'));
+            updateBar('airBar', 'airPercent', 'airMsg', el.getAttribute('data-air'), el.getAttribute('data-air-msg'));
+            updateBar('coolantBar', 'coolantPercent', 'coolantMsg', el.getAttribute('data-coolant'), el.getAttribute('data-coolant-msg'));
         }
 
         document.addEventListener("DOMContentLoaded", function() {
-            // AUTO-SELECT FIRST VEHICLE
             const firstCard = document.querySelector('.garage-card.active');
-            if(firstCard) {
-                selectCar(firstCard);
-            }
+            if(firstCard) selectCar(firstCard);
         });
     </script>
 </body>
