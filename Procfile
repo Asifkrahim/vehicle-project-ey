@@ -1,1 +1,1 @@
-web: gunicorn vehiclecarereal.wsgi
+web: gunicorn vehicle care real.wsgi
