@@ -2,18 +2,22 @@ from pathlib import Path
 import os
 import dj_database_url
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-x195(*%@m7f%t9k^c%_lxmobnjn6+c)=*y4z!sk%#5%g8jn^$2'
+# ==============================
+# 🔐 SECURITY SETTINGS
+# ==============================
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-dev-key")
 
-ALLOWED_HOSTS = ['.vercel.app', '127.0.0.1', 'localhost']
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-# Application definition
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
+
+# ==============================
+# 📦 INSTALLED APPS
+# ==============================
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -24,8 +28,13 @@ INSTALLED_APPS = [
     'vehiclecareapp',
 ]
 
+# ==============================
+# ⚙️ MIDDLEWARE
+# ==============================
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # for production static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -39,7 +48,6 @@ ROOT_URLCONF = 'vehiclecareproject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # Add this so Django looks for templates in app folders
         'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -54,8 +62,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'vehiclecareproject.wsgi.application'
 
-# Database
-# Default to SQLite (for your local computer)
+# ==============================
+# 🗄 DATABASE CONFIGURATION
+# ==============================
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -63,52 +73,64 @@ DATABASES = {
     }
 }
 
-# If running on Vercel, overwrite with the online database
-database_url = os.environ.get("DATABASE_URL")
-if database_url:
-    DATABASES["default"] = dj_database_url.parse("postgresql://neondb_owner:npg_hZOX7gzNvlp5@ep-weathered-breeze-ai7xdioq-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require")
+# If DATABASE_URL exists (production), override SQLite
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if DATABASE_URL:
+    DATABASES['default'] = dj_database_url.parse(DATABASE_URL)
 
-# Password validation
+# ==============================
+# 🔑 PASSWORD VALIDATION
+# ==============================
+
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Internationalization
+# ==============================
+# 🌍 INTERNATIONALIZATION
+# ==============================
+
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # optional if you have project-level static folder
-]
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # for collectstatic in production
+# ==============================
+# 📂 STATIC FILES
+# ==============================
 
-# Media files (optional, if you later upload PDFs, images, etc.)
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# ==============================
+# 📁 MEDIA FILES
+# ==============================
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# ==========================================
-# 📧 EMAIL CONFIGURATION (GMAIL SMTP)
-# ==========================================
+# ==============================
+# 📧 EMAIL CONFIGURATION
+# ==============================
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-# 👇 REPLACE THESE WITH YOUR REAL DETAILS 👇
-EMAIL_HOST_USER = 'asifkr664@gmail.com'   # <--- Put your REAL Gmail here
-EMAIL_HOST_PASSWORD = 'gprv ogxh dodt qupr'     # <--- Put your 16-char APP PASSWORD here (NOT your login password)
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+
+# ==============================
+# 🔐 DEFAULT AUTO FIELD
+# ==============================
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
